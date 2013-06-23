@@ -79,6 +79,9 @@ FeedView.prototype = {
 
     // ID of the animation interval if the view is being scrolled, or null otherwise.
     _scrolling: null,
+    
+    // Indicates if an entry is being removed.
+    _removing: null,
 
     // Indicates if a filter paramater is fixed and cannot be toggled by the user.
     _fixedUnread: false,
@@ -405,7 +408,8 @@ FeedView.prototype = {
         }
 
         function selectCentralEntry() {
-            this.selectEntry(this.getEntryInScreenCenter());
+            if (!this._removing)
+                this.selectEntry(this.getEntryInScreenCenter());
         }
     },
 
@@ -575,6 +579,7 @@ FeedView.prototype = {
         // Iterate starting from the last entry to avoid changing
         // positions of consecutive entries.
         let removedCount = 0;
+        this._removing = true;
         for (let i = indices.length - 1; i >= 0; i--) {
             let entry = this._loadedEntries[indices[i]];
 
@@ -604,6 +609,7 @@ FeedView.prototype = {
                 }
             }.bind(this)))
         }
+        this._removing = false;
 
         function afterEntriesRemoved() {
             this._setEmptyViewMessage();
