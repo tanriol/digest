@@ -257,7 +257,20 @@ let Commands = {
 
     openLink: function cmd_openLink(aURL) {
         let docURI = NetUtil.newURI(document.documentURI);
-        getTopWindow().gBrowser.loadOneTab(aURL, docURI);
+        let window = getTopWindow();
+
+        // Open a new tab as a child of the current tab
+        // Tree Style Tab http://piro.sakura.ne.jp/xul/_treestyletab.html.en#api
+        if ('TreeStyleTabService' in window)
+            window.TreeStyleTabService.readyToOpenChildTab(window.gBrowser.selectedTab);
+        // Tab Kit 2nd Edition https://addons.mozilla.org/firefox/addon/tabkit-2nd-edition/
+        if ('tabkit' in window)
+            window.tabkit.addingTab('related');
+
+        window.gBrowser.loadOneTab(aURL, docURI);
+
+        if ('tabkit' in window)
+            window.tabkit.addingTabOver();
     },
 
     displayShortcuts: function cmd_displayShortcuts() {
